@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -59,6 +60,26 @@ void Stack_clear(struct Stack * const inStack)
     }
 }
 
+void Stack_print_str(struct Stack * const inStack)
+{
+    struct Stack * buf = Stack_create(false);
+
+    while(inStack->top!=NULL)
+    {
+        char * const str = (char*)Stack_pop(inStack);
+
+        printf("\"%s\"\n", str);
+
+        Stack_push(buf, str);
+    }
+
+    inStack->top = buf->top;    // Kind
+    buf->top = NULL;            // of
+    Stack_delete(buf);          // hard-coded.
+
+    Stack_flip(inStack);
+}
+
 void Stack_delete(struct Stack * const inStack)
 {
     Stack_clear(inStack);
@@ -75,6 +96,22 @@ struct Stack * Stack_create(bool const inTakesOwnership)
     memcpy(retVal, &buf, sizeof *retVal);
 
     return retVal;
+}
+
+void Stack_flip(struct Stack * const inStack)
+{
+    assert(inStack!=NULL);
+
+    struct Stack * const buf = Stack_create(false);
+
+    while(inStack->top!=NULL)
+    {
+        Stack_push(buf, Stack_pop(inStack));
+    }
+
+    inStack->top = buf->top; // Kind of
+    buf->top = NULL;         // hard-coded.
+    Stack_delete(buf);
 }
 
 bool Stack_isEmpty(struct Stack const * const inStack)
